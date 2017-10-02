@@ -1,5 +1,6 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.lang.IllegalArgumentException;
 
 public class URLprocessing {
 
@@ -23,33 +24,32 @@ public class URLprocessing {
 	public static void parseDocument(CharSequence data) {
 		// call handler.takeUrl for each matched url
 		// Take into account that letters can be in lowercase or uppercase
-		String _front = "<(?:a|A)(?:.*?)(?:[Hh][Rr][Ee][Ff])*=*";
+		String _front = "<(?:a|A)(?:.*?)(?:[Hh][Rr][Ee][Ff])\\s*=\\s*";
 		// Take everything that is between "" or ''
 		String _address ="((\"([^>\"]*)\")|('([^>']*)'))";
 		String _back = "(?:.*?)>";
-		String match=null;
 		String reg_exp = _front + _address+_back;
 
 		Pattern pattern = Pattern.compile(reg_exp);
 		Matcher matcher = pattern.matcher(data);
-		int _find = 0
+		String matched_address=null;
+		int _find = 0;
 		while (matcher.find(_find)) {
-            _find = matcher.end()
-            if(matcher.group(3)==null){
-                match =matcher.group(5)
+            _find = matcher.end();
+            if(matcher.group(3)!=null){
+                matched_address =matcher.group(3);
             }
-            if(matcher.group(5)==null){
-            match =matcher.group(3)
+            if(matcher.group(5)!=null){
+            		matched_address =matcher.group(5);
             }
             try{
-                if(new MyURL(match).getProtocol().equals("http")){
-                    handler.takeUrl(match);
+            		MyURL url = new MyURL(matched_address);
+                if(url.getProtocol().equalsIgnoreCase("http")){
+                    handler.takeUrl(matched_address);
                 }
-            }catch(){
-
-
-
-
+            }catch(IllegalArgumentException e ){
+            		System.err.println(e.getMessage());
+            }
+		}
 	}
-
 }
