@@ -23,20 +23,29 @@ public class URLprocessing {
 	public static void parseDocument(CharSequence data) {
 		// call handler.takeUrl for each matched url
 		// Take into account that letters can be in lowercase or uppercase
-		String _front = "(<[Aa].*?[Hh][Rr][Ee][Ff]*=*";
+		String _front = "<(?:a|A)(?:.*?)(?:[Hh][Rr][Ee][Ff])*=*";
 		// Take everything that is between "" or ''
 		String _address ="((\"([^>\"]*)\")|('([^>']*)'))";
-		String _back = "[^>]*>)";
+		String _back = "(?:.*?)>";
 		String match=null;
 		String reg_exp = _front + _address+_back;
 
 		Pattern pattern = Pattern.compile(reg_exp);
 		Matcher matcher = pattern.matcher(data);
-		
-		while (matcher.find()) {
-			match=matcher.group(1);
-			handler.takeUrl(match);
-		}
+		int _find = 0
+		while (matcher.find(_find)) {
+            _find = matcher.end()
+            if(matcher.group(3)==null){
+                match =matcher.group(5)
+            }
+            if(matcher.group(5)==null){
+            match =matcher.group(3)
+            }
+            try{
+                if(new MyURL(match).getProtocol().equals("http")){
+                    handler.takeUrl(match);
+                }
+            }catch(){
 
 
 
