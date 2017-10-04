@@ -18,8 +18,6 @@ class URLThread implements Runnable{
 }
 
 public class Wget {	
-	
-
 
 	public static void doIterative(String requestedURL, String proxyHost,
 			int proxyPort) {
