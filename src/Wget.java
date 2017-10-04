@@ -19,34 +19,7 @@ class URLThread implements Runnable{
 
 public class Wget {	
 	
-	public static void doMultiThreaded(String requestedURL, String proxyHost,
-			int proxyPort) {
-		final URLQueue queue = new SynchronizedListQueue();
-		final HashSet<String> seen = new HashSet<String>();
-		// Synchronized
-		URLprocessing.handler = new URLprocessing.URLhandler() {
-			// this method is called for each matched url
-			public synchronized void takeUrl(String url) {
-				// Add a condition to wait
-				if (!seen.contains(url)) {
-					queue.enqueue(url);
-					seen.add(url);
-				}
-			}
-		};
-		// to start, we push the initial url into the queue
-		URLprocessing.handler.takeUrl(requestedURL);
-		while (Thread.activeCount()!=0) {
-			try {
-				String url = queue.dequeue();
-				URLThread url_thread = new URLThread(url, proxyHost, proxyPort);
-				Thread _thread = new Thread(url_thread);
-				_thread.start();
-			}catch(NoSuchElementException e) {
-				System.err.println(e.getMessage());
-			}
-		}
-	}
+
 
 	public static void doIterative(String requestedURL, String proxyHost,
 			int proxyPort) {
