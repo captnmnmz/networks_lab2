@@ -14,7 +14,7 @@ class URLThread implements Runnable{
 	}
 	public void run() {
 		Xurl.query(requestedURL, proxyHost, proxyPort);
-	};
+	}
 }
 
 public class Wget {	
@@ -90,7 +90,7 @@ public class Wget {
 
 		}
 	}
-	
+
 
 	public static void doIterative(String requestedURL, String proxyHost,
 			int proxyPort) {
