@@ -14,12 +14,12 @@ class URLThread implements Runnable{
 	}
 	public void run() {
 		Xurl.query(requestedURL, proxyHost, proxyPort);
-	};
+	}
 }
 
 public class Wget {	
 	
-	public static void doMultiThread(String requestedURL, String proxyHost,
+	public static void doMultiThreaded(String requestedURL, String proxyHost,
 			int proxyPort) {
 		final URLQueue queue = new SynchronizedListQueue();
 		final HashSet<String> seen = new HashSet<String>();
@@ -45,11 +45,8 @@ public class Wget {
 			}catch(NoSuchElementException e) {
 				System.err.println(e.getMessage());
 			}
-
 		}
-		
 	}
-	
 
 	public static void doIterative(String requestedURL, String proxyHost,
 			int proxyPort) {
