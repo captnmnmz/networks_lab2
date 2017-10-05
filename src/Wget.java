@@ -3,6 +3,9 @@ import java.util.NoSuchElementException;
 import java.lang.Thread;
 
 class URLThread implements Runnable{
+	/**
+	 * A thread that lives and dies around one url download
+	 */
 	String requestedURL;
 	String proxyHost; 
 	int proxyPort;
