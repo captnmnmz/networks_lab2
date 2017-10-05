@@ -21,12 +21,21 @@ class URLThread implements Runnable{
 }
 
 class URL_pool implements Runnable{
-
+	/**
+	 * A thread that is created for a pool, and dies once there is no more work
+	 */
+	URLQueue queue;
+	String proxyHost; 
+	int proxyPort;	
 	
-	public URL_pool() {
-		
+	public URL_pool(URLQueue queue,String proxyHost,int proxyPort) {
+		this.queue=queue;
+		this.proxyHost = proxyHost;
+		this.proxyPort = proxyPort;
 	}
+	
 	public void run() {
+		
 
 	}
 }
@@ -90,8 +99,8 @@ public class Wget {
 		URLprocessing.handler.takeUrl(requestedURL);
 		int count = Thread.activeCount();
 		while (Thread.activeCount()!=count+number_threads) {
-			URL_pool _pool = new URL_pool();
-			Thread _thread = new Thread();
+			URL_pool _pool = new URL_pool(queue,proxyHost,proxyPort);
+			Thread _thread = new Thread(_pool);
 		}
 		while (Thread.activeCount()>count || !queue.isEmpty()) {
 			if (!queue.isEmpty()){
