@@ -15,6 +15,7 @@ class URLThread implements Runnable{
 		this.proxyHost = proxyHost;
 		this.proxyPort = proxyPort;
 	}
+
 	public void run() {
 		Xurl.query(requestedURL, proxyHost, proxyPort);
 	}
@@ -34,8 +35,22 @@ class URL_pool implements Runnable{
 		this.proxyPort = proxyPort;
 	}
 	
+	public Boolean allBlocked(){
+		Thread[] threads = null;
+		Thread.enumerate(threads);
+		for (Thread t : threads){
+			if (t.getState()==Thread.State.RUNNABLE){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void run() {
-		
+			while(allBlocked()==false){
+				String requestedURL=queue.dequeue();
+				Xurl.query(requestedURL, proxyHost, proxyPort);
+			}
 
 	}
 }
@@ -98,22 +113,15 @@ public class Wget {
 		// to start, we push the initial url into the queue
 		URLprocessing.handler.takeUrl(requestedURL);
 		int count = Thread.activeCount();
+		
+		ThreadGroup group = new ThreadGroup("pool");
+		
 		while (Thread.activeCount()!=count+number_threads) {
 			URL_pool _pool = new URL_pool(queue,proxyHost,proxyPort);
-			Thread _thread = new Thread(_pool);
-		}
-		while (Thread.activeCount()>count || !queue.isEmpty()) {
-			if (!queue.isEmpty()){
-				try {
-					String url = queue.dequeue();
-					URLThread url_thread = new URLThread(url, proxyHost, proxyPort);
-					Thread _thread = new Thread(url_thread);
-					_thread.start();
-				}catch(NoSuchElementException e) {
-					System.err.println(e.getMessage());
-				}
-			}else{
-			}
+			Thread _thread = new Thread(group,_pool);
+			_thread.start();
+
+
 		}
 	}
 
@@ -151,7 +159,7 @@ public class Wget {
 		int proxyPort = -1;
 		if (args.length > 2)
 			proxyPort = Integer.parseInt(args[2]);
-		doIterative(args[0], proxyHost, proxyPort);
+		doThreadedPool(args[0], proxyHost, proxyPort);
 	}
 
 }

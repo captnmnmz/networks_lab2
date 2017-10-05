@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.lang.Thread;
+import java.io.IOException;
 import java.lang.InterruptedException;
 
 public class BlockingListQueue implements URLQueue {
@@ -20,7 +21,11 @@ public class BlockingListQueue implements URLQueue {
 
 	public synchronized void enqueue(String url) {
 		queue.add(url);
-		Thread.currentThread().notify();
+		synchronized(Thread.currentThread()){
+			Thread.currentThread().notify();
+		}
+
+
 
 	}
 
