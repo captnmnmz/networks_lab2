@@ -20,6 +20,17 @@ class URLThread implements Runnable{
 	}
 }
 
+class URL_pool implements Runnable{
+
+	
+	public URL_pool() {
+		
+	}
+	public void run() {
+
+	}
+}
+
 public class Wget {	
 	
 	public static void doMultiThreaded(String requestedURL, String proxyHost,
@@ -63,6 +74,7 @@ public class Wget {
 		
 		final URLQueue queue = new BlockingListQueue();
 		final HashSet<String> seen = new HashSet<String>();
+		final int number_threads = 50;
 		// Synchronized
 		URLprocessing.handler = new URLprocessing.URLhandler() {
 			// this method is called for each matched url
@@ -77,6 +89,10 @@ public class Wget {
 		// to start, we push the initial url into the queue
 		URLprocessing.handler.takeUrl(requestedURL);
 		int count = Thread.activeCount();
+		while (Thread.activeCount()!=count+number_threads) {
+			URL_pool _pool = new URL_pool();
+			Thread _thread = new Thread();
+		}
 		while (Thread.activeCount()>count || !queue.isEmpty()) {
 			if (!queue.isEmpty()){
 				try {
@@ -89,8 +105,6 @@ public class Wget {
 				}
 			}else{
 			}
-
-
 		}
 	}
 
