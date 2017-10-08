@@ -35,20 +35,14 @@ class URL_pool implements Runnable{
 		this.proxyPort = proxyPort;
 	}
 	
-	public Boolean allBlocked(){
-		Thread[] threads = null;
-		Thread.enumerate(threads);
-		for (Thread t : threads){
-			if (t.getState()==Thread.State.RUNNABLE){
-				return false;
-			}
-		}
-		return true;
-	}
+
 	
 	public void run() {
-			while(allBlocked()==false){
+			while(true){
 				String requestedURL=queue.dequeue();
+				if (requestedURL==""){
+					break;
+				}
 				Xurl.query(requestedURL, proxyHost, proxyPort);
 			}
 
@@ -99,6 +93,9 @@ public class Wget {
 		final URLQueue queue = new BlockingListQueue();
 		final HashSet<String> seen = new HashSet<String>();
 		final int number_threads = 50;
+		
+		
+		Thread[] thread_list = new Thread[number_threads];
 		// Synchronized
 		URLprocessing.handler = new URLprocessing.URLhandler() {
 			// this method is called for each matched url
@@ -112,16 +109,31 @@ public class Wget {
 		};
 		// to start, we push the initial url into the queue
 		URLprocessing.handler.takeUrl(requestedURL);
-		int count = Thread.activeCount();
 		
 		ThreadGroup group = new ThreadGroup("pool");
 		
-		while (Thread.activeCount()!=count+number_threads) {
+		while (group.activeCount()!=number_threads) {
 			URL_pool _pool = new URL_pool(queue,proxyHost,proxyPort);
 			Thread _thread = new Thread(group,_pool);
 			_thread.start();
 
 
+		}
+		
+		while(true){
+			int count = group.enumerate(thread_list);
+			int inc=0;
+			for (Thread t : thread_list){
+				if (t.getState()==Thread.State.WAITING){
+					inc++;
+				}
+			}
+			if (inc==count){
+				for (int i=0; i<number_threads;i++){
+					queue.enqueue("");
+				}
+			}
+			break;
 		}
 	}
 

@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.lang.InterruptedException;
 
 public class BlockingListQueue implements URLQueue {
+	/**
+	 * @author - Jules YATES
+	 * @author - Bastien CHEVALLIER
+	 */
 	
 	private final LinkedList<String> queue;
 	
@@ -21,18 +25,14 @@ public class BlockingListQueue implements URLQueue {
 
 	public synchronized void enqueue(String url) {
 		queue.add(url);
-		synchronized(Thread.currentThread()){
-			Thread.currentThread().notify();
-		}
-
-
-
+		notify();
+		
 	}
 
 	public synchronized String dequeue() {
 		while(queue.isEmpty()){
 			try{
-				Thread.currentThread().wait();
+				wait();
 			}catch (InterruptedException e){
 				System.err.println(e.getMessage());
 			}
